@@ -1,11 +1,12 @@
+import gym
+gym.logger.set_level(40)
+
 import minerl
 import torch
-from minerl.data import BufferedBatchIter
-
 from torch import nn
 
 from model import StateActionMap
-from data import process_batch
+from hierarchical_inverse_dynamics.data import process_batch, BufferedBatchIter
 
 
 if __name__ == "__main__":
@@ -25,13 +26,14 @@ if __name__ == "__main__":
         iterator = BufferedBatchIter(train_data)
         sum_loss = 0.
         n_batches = 0
-        for batch in iterator.buffered_batch_iter(batch_size=batch_size, num_epochs=1):
-            image_arr, disc_targets, cont_targets = process_batch(batch)
+        for batch in iter(iterator):
+            image_arr, disc_targets, cont_targets = batch
             image_arr = torch.Tensor(image_arr).cuda()
             disc_targets = torch.Tensor(disc_targets).cuda()
             cont_targets = torch.Tensor(cont_targets).cuda()
+            actions = torch.cat([disc_targets, cont_targets], dim=-1)
 
-            disc_pred, cont_pred = model(image_arr)
+            disc_pred, cont_pred = model(image_arr, actions)
             loss = disc_loss(disc_pred, disc_targets) + cont_loss(cont_pred, cont_targets)
 
             optimizer.zero_grad()
@@ -47,7 +49,7 @@ if __name__ == "__main__":
         iterator = BufferedBatchIter(eval_data)
         sum_loss = 0.
         n_batches = 0
-        for batch in iterator.buffered_batch_iter(batch_size=batch_size, num_epochs=1):
+        for batch in iter(iterator):
             image_arr, disc_targets, cont_targets = process_batch(batch)
             image_arr = torch.Tensor(image_arr).cuda()
             disc_targets = torch.Tensor(disc_targets).cuda()
