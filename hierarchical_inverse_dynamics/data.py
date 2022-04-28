@@ -19,14 +19,14 @@ def process_batch(batch):
     states = states['pov']
     states_prime = states_prime['pov']
     image_arr = np.concatenate([states, states_prime]) / 255.
-    image_arr = image_arr.transpose(0, 3, 1, 2)
+    image_arr = image_arr.transpose(0, 3, 1, 2).astype(np.float32)
 
     disc_action_names = ['attack', 'back', 'forward', 'jump', 'left', 'right', 'sneak', 'sprint']
 
     bs = len(actions)
     n_steps = len(actions[0])
-    disc_targets = np.empty((bs, n_steps, len(disc_action_names)))
-    cont_targets = np.empty((bs, n_steps, 2))
+    disc_targets = np.empty((bs, n_steps, len(disc_action_names)), dtype=np.float32)
+    cont_targets = np.empty((bs, n_steps, 2), dtype=np.float32)
 
     for i in range(bs):
         for j in range(n_steps):

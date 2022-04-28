@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from mingpt.model import GPTConfig, Block
 
+
 class Transformer(nn.Module):
     def __init__(self, config):
         super(Transformer, self).__init__()
@@ -22,6 +23,7 @@ class Transformer(nn.Module):
             x = block(x)
         x = self.ln_f(x)
         return self.out_projection(x)
+
 
 class ConvBlock(nn.Module):
     def __init__(self, in_channels: int, block_layout: list[int]):
@@ -70,9 +72,9 @@ class StateActionMap(nn.Module):
     def __init__(self, state_features=256, n_actions=10, n_steps=1):
         super(StateActionMap, self).__init__()
         self.n_steps = n_steps
-        self.conv_net = ConvNet(net_layout=[[32, 64], [128, 128], [128, 256], [256, 256]], out_features=state_features)
+        self.conv_net = ConvNet(net_layout=[[32, 64], [64, 64], [128, 128], [256]], out_features=state_features)
 
-        self.transformer_config = GPTConfig(vocab_size=1, block_size=n_steps, n_embd=256, n_layer=4, n_head=8)
+        self.transformer_config = GPTConfig(vocab_size=1, block_size=n_steps, n_embd=128, n_layer=2, n_head=8)
         self.model = Transformer(self.transformer_config)
 
 
