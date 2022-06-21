@@ -1,5 +1,0 @@
--wrap data generator into  pytorch iterable dataset
--data.py - frozen because of torch issue
--layers.py
--training.py
--eval.py
