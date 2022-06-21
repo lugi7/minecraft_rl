@@ -27,7 +27,6 @@ class ViT(nn.Module):
         for _ in range(config.n_layer):
             self.block_list.append(Block(config))
         self.ln_f = nn.LayerNorm(config.n_embd)
-        # self.out_projection = nn.Linear(config.n_embd, 2 * config.n_tiles_per_axis)
 
     def _tile(self, x):
         """
@@ -55,11 +54,7 @@ class ViT(nn.Module):
         x = self.embedding2d(x)
         for block in self.block_list:
             x = block(x)
-        # x = self.ln_f(x)
         return x
-        # x = self.out_projection(x)
-        # ntpa = self.config.n_tiles_per_axis
-        # return x.view(-1, ntpa**2, 2, ntpa).permute(0, 3, 1, 2)
 
 
 if __name__ == "__main__":
