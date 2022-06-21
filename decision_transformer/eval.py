@@ -5,7 +5,6 @@ from collections import OrderedDict
 import cv2
 
 import torch
-import matplotlib.pyplot as plt
 
 from model import DecisionTransformer
 from mingpt.model import GPTConfig
@@ -24,7 +23,6 @@ class ModelWrapper:
         for ind, name in enumerate(disc_action_names):
             action_dict[name] = np.array(actions_disc[ind], dtype=np.int32)
         action_dict['camera'] = actions_cont
-        # action_dict = OrderedDict(action_dict)
         self.last_action = action_dict
         return action_dict
 
@@ -57,6 +55,7 @@ class ModelWrapper:
             actions_pred = self.model(self.rtgs, self.obss, self.actions, self.inds)[0, -1]
         return self._logits_to_action_dict(actions_pred)
 
+
 if __name__ == "__main__":
     env = gym.envs.make('MineRLTreechop-v0')
     seq_len = 256
@@ -79,25 +78,13 @@ if __name__ == "__main__":
 
     # Initial trajectory
     obs = env.reset()
-
     action = wrapped_model.init_step(obs=obs)
-
-    # plt.imshow(obs['pov'])
-    # plt.show(block=False)
     done = False
+
     while not done:
-        # print('step')
         print(action)
         video.write(obs['pov'][..., ::-1])
         obs, reward, done, _ = env.step(action)
         action = wrapped_model.step(obs, reward)
-        # plt.imshow(obs['pov'])
-        # plt.show(block=False)
-        # plt.pause(0.1)
     video.release()
 
-    # while True:
-    #     img = np.random.randint(0, 256, (64, 64, 3))
-    #     plt.imshow(img)
-    #     plt.show(block=False)
-    #     plt.pause(0.5)
