@@ -24,7 +24,8 @@ class TrajectoryDataset(Dataset):
         sample = tuple([x[start: end] for x in sample])
         return sample, (start, end)
 
-    def _process_single_action(self, action):
+    @staticmethod
+    def _process_single_action(action):
         disc_action_names = ['attack', 'back', 'forward', 'jump', 'left', 'right', 'sneak', 'sprint']
         disc_action = np.stack([action[name] for name in disc_action_names], axis=0)
         cont_action = action['camera'].astype(np.float32) / 180.
